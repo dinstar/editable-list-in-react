@@ -1,0 +1,8 @@
+@import '@picocss/pico';
+
+body {
+  margin-top: 30px;
+
+  --form-element-spacing-vertical: 4px;
+  --form-element-spacing-horizontal: 8px;
+}
