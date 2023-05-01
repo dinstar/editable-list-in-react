@@ -3,10 +3,10 @@ import './style.css';
 
 import List from './components/List';
 
+const sourceItems = [{ editing: true, id: 1, text: 'Hello', completed: true }];
+
 export default function App() {
-  const [items, setItems] = useState([
-    { editing: false, id: 1, text: 'Hello', completed: true },
-  ]);
+  const [items, setItems] = useState(sourceItems);
 
   const handleAdd = useCallback(() => {
     setItems((value) => [
