@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 
 import ListItem from './ListItem';
-import NestedListListItem from './NestedListListItem';
 
 import css from './List.module.css';
 
