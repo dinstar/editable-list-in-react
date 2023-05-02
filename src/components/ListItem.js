@@ -8,15 +8,18 @@ import css from './ListItem.module.css';
 export default React.memo(function ListItem({
   item,
   onListItemAdd,
+  onListItemDelete,
   onListItemUpdate,
   onListItemEdit,
   onNestedListCreate,
-  showAddButton = true,
-  showNestedListAddButton = true,
+  selectAbove,
+  selectBellow,
+  index
 }) {
   const { id, text, editing, completed } = item;
 
   const inputRef = useRef(null);
+  const isEmpty = useRef(text == '');
 
   const [updatedText, setUpdatedText] = useState(text);
 
@@ -32,10 +35,18 @@ export default React.memo(function ListItem({
 
   const handleKeyUp = useCallback(
     (event) => {
-      if (event.key === 'Enter' || event.key === 'Escape') {
-        if (updatedText !== text) onListItemUpdate({ text: updatedText, id });
-        else onListItemEdit(id, false);
+      if (event.key === 'Backspace' && updatedText == '')
+      {
+        if (isEmpty.current)
+          onListItemDelete(id);
       }
+      isEmpty.current = updatedText == '';
+      if (event.key === 'ArrowUp')
+        selectAbove(id, { isEmpty: isEmpty.current });
+        else if (event.key === 'ArrowDown')
+          selectBellow(id, { isEmpty: isEmpty.current });
+      else if (event.key === 'Enter')
+        onListItemAdd(id, { isEmpty: isEmpty.current });
     },
     [onListItemUpdate, updatedText, text, id]
   );
@@ -55,6 +66,7 @@ export default React.memo(function ListItem({
       <div className={css.nestedList}>
         <List
           onListItemAdd={onListItemAdd}
+          onListItemDelete={onListItemDelete}
           onListItemUpdate={onListItemUpdate}
           onListItemEdit={onListItemEdit}
           onNestedListCreate={onNestedListCreate}
@@ -76,6 +88,7 @@ export default React.memo(function ListItem({
         {editing && (
           <input
             type="text"
+            id={'tb_'+ index}
             ref={inputRef}
             onKeyUp={handleKeyUp}
             onChange={handleChange}
@@ -91,21 +104,6 @@ export default React.memo(function ListItem({
             {text}
           </div>
         )}
-        <div className={css.buttonContainer}>
-          {showNestedListAddButton && (
-            <button
-              className={css.addButton}
-              onClick={() => onNestedListCreate(id)}
-            >
-              ⑃
-            </button>
-          )}
-          {showAddButton && (
-            <button className={css.addButton} onClick={() => onListItemAdd(id)}>
-              +
-            </button>
-          )}
-        </div>
       </div>
       {nestedList}
     </li>

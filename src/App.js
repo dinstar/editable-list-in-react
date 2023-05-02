@@ -3,16 +3,28 @@ import './style.css';
 
 import List from './components/List';
 
-const sourceItems = [{ editing: true, id: 1, text: 'Hello', completed: true }];
+const sourceItems = [{ editing: true, id: Date.now(), text: 'Hello', completed: true }];
 
 export default function App() {
   const [items, setItems] = useState(sourceItems);
 
-  const handleAdd = useCallback(() => {
-    setItems((value) => [
-      ...value,
-      { id: Date.now(), text: '', editing: true, completed: false },
-    ]);
+  const handleAdd = useCallback((id, { isEmpty }) => {
+    setItems((value) => {
+      const newItem = { id: Date.now(), text: '', editing: true, completed: false };
+      const index = value.findIndex(item => item.id == id);
+      if ( ! isEmpty || index < value.length - 1)
+        value.splice(index + 1, 0, newItem);
+      return [...value]
+    });
+  }, []);
+
+  const handleDelete = useCallback((id) => {
+      setItems((value) => {
+        if (value.length > 1)
+          return [...(value.filter(item => item.id != id))]
+        else
+          return value;
+      });
   }, []);
 
   const handleEdit = useCallback((id, state) => {
@@ -44,7 +56,7 @@ export default function App() {
       const updatedItem = {
         ...value[itemIndex],
         text: updatedText || value[itemIndex].text,
-        editing: false,
+        // editing: false,
         completed:
           completed != undefined ? completed : value[itemIndex].completed,
       };
@@ -85,6 +97,7 @@ export default function App() {
     <List
       items={items}
       onListItemAdd={handleAdd}
+      onListItemDelete={handleDelete}
       onListItemEdit={handleEdit}
       onListItemUpdate={handleUpdate}
       onNestedListCreate={handleNestedListCreate}
